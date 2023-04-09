@@ -17,10 +17,10 @@
 			<a class="navbar-brand" href="/">Capstone</a>
 		  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-			  <li class="active"><a href="/login">Home <span class="sr-only">(current)</span></a></li>
+			  <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-			  <li><a href="#" style="padding-right: 200px;">Logout</a></li>
+			  <li><a href="/logout" style="padding-right: 200px;">Logout</a></li>
 			</ul>
 		  </div><!-- /.navbar-collapse -->
 		</div><!-- /.container-fluid -->
@@ -29,33 +29,13 @@
 
 	<div class="profile-card">
         <div class="profile-cover">
-
             <div class="profile-avatar">
-                <div class="btns-container">
-                    <div class="profile-links">
-                        <a class="zoom-avatar" href="#"><img src="https://dl.dropboxusercontent.com/s/5liaxzvwbfuqzpo/zoom.png"></a>
-                        <a class="read-more" href="#"><img src="https://dl.dropboxusercontent.com/s/62dfoo9h44o58lw/more.png"></a>
-                        <a class="view-map" href="#"><img src="https://dl.dropboxusercontent.com/s/9ofmihok0h64lvn/location.png"></a>
-                    </div>
-                </div>
-                <a href="#"><img src="https://dl.dropboxusercontent.com/s/7pcnqq18skh1myk/avatar.jpg" alt="Anis M" /></a>
+                <img src="<%= image %>">
             </div>
             <div class="profile-details">
                 <h1><%= name %></h1>
                 <h6><%= email %></h6>
             </div>
-        </div>
-        <div class="profile-info" style="display: none;">
-            <h1>About Me</h1>
-            <div class="info-area">
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.Stet clita kasd gubergren, no sea takimata sanctus est.Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-            </div>
-            <div class="clear"></div>
-        </div>
-        <div class="profile-map" style="display: none;">
-            <iframe width="100%" height="150" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Saveology+New+York&amp;aq=&amp;sll=37.0625,-95.677068&amp;sspn=40.052282,86.572266&amp;t=h&amp;ie=UTF8&amp;hq=Saveology&amp;hnear=New+York&amp;ll=40.552027,-74.420902&amp;spn=0.357117,0.912844&amp;iwloc=near&amp;output=embed"></iframe>
-            <div class="clear"></div>
         </div>
         
 

@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 
 
@@ -17,7 +19,7 @@ router.get('/register', function (req, res, next) {
 
 
 router.post('/api/register', function(req, res, next) {
-	console.log(req.body);
+	
 	var personInfo = req.body;
 
 
@@ -25,7 +27,6 @@ router.post('/api/register', function(req, res, next) {
 		res.send();
 	} else {
 		if (personInfo.password == personInfo.passwordConf) {
-
 			User.findOne({email:personInfo.email},function(err,data){
 				if(!data){
 					var c;
@@ -37,13 +38,16 @@ router.post('/api/register', function(req, res, next) {
 						}else{
 							c=1;
 						}
-
+						
+						bcrypt.hash(personInfo.password, saltRounds, function (err,   hash){
+						console.log(hash);
 						var newPerson = new User({
 							unique_id:c,
 							email:personInfo.email,
 							username: personInfo.username,
-							password: personInfo.password,
-							passwordConf: personInfo.passwordConf
+							password: hash,
+							passwordConf: hash,
+							profileimg: "/img/profile.png"
 						});
 
 						newPerson.save(function(err, Person){
@@ -53,8 +57,9 @@ router.post('/api/register', function(req, res, next) {
 								console.log('Success');
 						});
 
-					}).sort({_id: -1}).limit(1);
+					});
 					res.send({"Success":"You are regestered,You can login now."});
+				});
 				}else{
 					res.send({"Success":"Email is already used."});
 				}
@@ -74,8 +79,9 @@ router.post('/api/login', function (req, res, next) {
 	//console.log(req.body);
 	User.findOne({email:req.body.email},function(err,data){
 		if(data){
-			
-			if(data.password==req.body.password){
+			bcrypt.compare(req.body.password, data.password, function (err, result){
+				console.log(result);
+			if(result){
 				//console.log("Done Login");
 				req.session.userId = data.unique_id;
 				//console.log(req.session.userId);
@@ -83,7 +89,7 @@ router.post('/api/login', function (req, res, next) {
 				
 			}else{
 				res.send({"Success":"Wrong password!"});
-			}
+			}})
 		}else{
 			res.send({"Success":"This Email Is not regestered!"});
 		}
@@ -99,7 +105,7 @@ router.get('/profile', function (req, res, next) {
 			res.redirect('/login');
 		}else{
 			//console.log("found");
-			return res.render('data.ejs', {"name":data.username,"email":data.email});
+			return res.render('data.ejs', {"name":data.username,"email":data.email,"image":data.profileimg});
 		}
 	});
 });
