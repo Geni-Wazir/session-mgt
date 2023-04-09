@@ -2,12 +2,21 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
 
+
+
+
 router.get('/', function (req, res, next) {
 	return res.render('index.ejs');
 });
 
 
-router.post('/', function(req, res, next) {
+
+router.get('/register', function (req, res, next) {
+	return res.render('registration.ejs');
+});
+
+
+router.post('/api/register', function(req, res, next) {
 	console.log(req.body);
 	var personInfo = req.body;
 
@@ -61,7 +70,7 @@ router.get('/login', function (req, res, next) {
 	return res.render('login.ejs');
 });
 
-router.post('/login', function (req, res, next) {
+router.post('/api/login', function (req, res, next) {
 	//console.log(req.body);
 	User.findOne({email:req.body.email},function(err,data){
 		if(data){
@@ -87,7 +96,7 @@ router.get('/profile', function (req, res, next) {
 		console.log("data");
 		console.log(data);
 		if(!data){
-			res.redirect('/');
+			res.redirect('/login');
 		}else{
 			//console.log("found");
 			return res.render('data.ejs', {"name":data.username,"email":data.email});
@@ -103,7 +112,7 @@ router.get('/logout', function (req, res, next) {
     	if (err) {
     		return next(err);
     	} else {
-    		return res.redirect('/');
+    		return res.redirect('/login');
     	}
     });
 }
@@ -113,7 +122,7 @@ router.get('/forgetpass', function (req, res, next) {
 	res.render("forget.ejs");
 });
 
-router.post('/forgetpass', function (req, res, next) {
+router.post('/api/forgetpass', function (req, res, next) {
 	//console.log('req.body');
 	//console.log(req.body);
 	User.findOne({email:req.body.email},function(err,data){
