@@ -9,5 +9,6 @@ module.exports = {
     },
     session: {
         cookieKey: "capstone-project-1234!!-secret-key-6789!!"
-    }
+    },
+    jwt_secret_key: "capstone-project-jwt-1234!!-secret-key-6789!!"
 };

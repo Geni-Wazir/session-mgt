@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 
 const jwt = require("jsonwebtoken");
+const keys = require('../config/keys');
 
 
 const saltRounds = 10;
@@ -62,7 +63,7 @@ router.post('/api/register', function(req, res, next) {
 							username: personInfo.username,
 							password: hash,
 							passwordConf: hash,
-							profileimg: "/img/profile.png"
+							thumbnail: "/img/profile.png"
 						});
 
 						newPerson.save(function(err, Person){
@@ -91,14 +92,14 @@ router.get('/login', function (req, res, next) {
 });
 
 router.post('/api/login', function (req, res, next) {
-	//console.log(req.body);
+	console.log("in login : ", req.body);
 	model.User.findOne({email:req.body.email},function(err,data){
 		if(data){
 			bcrypt.compare(req.body.password, data.password, function (err, result){
 			if(result){
 				const token = jwt.sign(
 					{ user_id: data._id, email: data.email },
-					"testkey",
+					keys.jwt_secret_key,
 					{
 					  expiresIn: "2h",
 					}
@@ -120,7 +121,7 @@ router.post('/api/login', function (req, res, next) {
 
 router.get('/profile', function (req, res, next) {
 	console.log("profile");
-	User.findOne({unique_id:req.session.userId},function(err,data){
+	model.User.findOne({unique_id:req.session.userId},function(err,data){
 		console.log("data");
 		console.log(data);
 		if(!data){
@@ -137,12 +138,19 @@ router.get('/profile', function (req, res, next) {
 });
 
 router.get('/logout', function (req, res, next) {
-	console.log("logout")
-	if (req.session) {
-		req.logOut();
-		req.session = null;
-		return res.redirect('/login');
-	}
+	console.log("logout", req.session)
+	var newlogout = new model.Blacklistjwt({
+		token: req.cookies.token
+	});
+	newlogout.save(function(err, result){
+		if(err)
+			console.log(err);
+		else
+			console.log('Success');
+	});
+
+	res.clearCookie('token');
+	return res.redirect('/login');
 });
 
 router.get('/forgetpass', function (req, res, next) {

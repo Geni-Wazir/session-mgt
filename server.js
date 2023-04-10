@@ -32,6 +32,12 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
 });
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');	
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(session({
   secret: 'work hard',
   resave: true,

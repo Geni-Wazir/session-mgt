@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 userSchema = new Schema( {
-	unique_id: Number,
+	id: Number,
 	email: String,
 	username: String,
 	password: String,
@@ -10,8 +10,8 @@ userSchema = new Schema( {
 	profileimg: String,
 	googleId: String,
     thumbnail: String
-	profileimg: String,
 }),
+
 User = mongoose.model('User', userSchema);
 
 
