@@ -10,7 +10,17 @@ userSchema = new Schema( {
 	profileimg: String,
 	googleId: String,
     thumbnail: String
+	profileimg: String,
 }),
 User = mongoose.model('User', userSchema);
 
-module.exports = User;
+
+blacklistjwt = new Schema( {
+	
+	token: String
+
+}),
+
+Blacklistjwt = mongoose.model('BlackList', blacklistjwt);
+
+module.exports = {User, Blacklistjwt}

@@ -6,11 +6,15 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
+
 const passportConfig = require('./config/passportConfig');
 const cookieSession = require('cookie-session');
 const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 const keys = require('./config/keys')
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 
 mongoose.connect('mongodb://127.0.0.1/my_db', {
   useNewUrlParser: true,
@@ -25,22 +29,8 @@ mongoose.connect('mongodb://127.0.0.1/my_db', {
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {});
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');	
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(express.static(__dirname + '/views'));
-
-// set up session cookies
-app.use(cookieSession({
-  maxAge: 24 * 60 * 60 * 1000,
-  keys: [keys.session.cookieKey]
-}));
-
+db.once('open', function () {
+});
 
 app.use(session({
   secret: 'work hard',
@@ -57,6 +47,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+app.use(express.static(__dirname + '/views'));
 
 var index = require('./routes/index');
 app.use('/', index);
