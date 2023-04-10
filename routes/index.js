@@ -1,22 +1,34 @@
-var express = require('express');
-var router = express.Router();
-var User = require('../models/user');
-var bcrypt = require('bcrypt');
+const express = require('express');
+const router = express.Router();
+const User = require('../models/user');
+const bcrypt = require('bcrypt');
+const passport = require('passport');
+
 const saltRounds = 10;
 
 
-
-
 router.get('/', function (req, res, next) {
+	console.log("in /")
 	return res.render('index.ejs');
 });
 
+
+// auth with google
+router.get('/auth/google', passport.authenticate('google', {
+    scope: ['profile']
+}));
+
+// callback route for google to redirect to
+// hand control to passport to use code to grab profile info
+router.get('/auth/google/redirect', passport.authenticate('google'), (req, res) => {
+    // res.send(req.user);
+    res.redirect('/profile');
+});
 
 
 router.get('/register', function (req, res, next) {
 	return res.render('registration.ejs');
 });
-
 
 router.post('/api/register', function(req, res, next) {
 	
@@ -105,7 +117,11 @@ router.get('/profile', function (req, res, next) {
 			res.redirect('/login');
 		}else{
 			//console.log("found");
-			return res.render('data.ejs', {"name":data.username,"email":data.email,"image":data.profileimg});
+			return res.render('data.ejs', {
+				"name": data.username,
+				"email": data.email,
+				"image": data.thumbnail
+			});
 		}
 	});
 });
@@ -113,15 +129,10 @@ router.get('/profile', function (req, res, next) {
 router.get('/logout', function (req, res, next) {
 	console.log("logout")
 	if (req.session) {
-    // delete session object
-    req.session.destroy(function (err) {
-    	if (err) {
-    		return next(err);
-    	} else {
-    		return res.redirect('/login');
-    	}
-    });
-}
+		req.logOut();
+		req.session = null;
+		return res.redirect('/login');
+	}
 });
 
 router.get('/forgetpass', function (req, res, next) {
