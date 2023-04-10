@@ -8,8 +8,17 @@ userSchema = new Schema( {
 	username: String,
 	password: String,
 	passwordConf: String,
-	profileimg: String
+	profileimg: String,
 }),
 User = mongoose.model('User', userSchema);
 
-module.exports = User;
+
+blacklistjwt = new Schema( {
+	
+	token: String
+
+}),
+
+Blacklistjwt = mongoose.model('BlackList', blacklistjwt);
+
+module.exports = {User, Blacklistjwt}

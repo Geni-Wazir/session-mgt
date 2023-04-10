@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var User = require('../models/user');
+var model = require('../models/user');
 var bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+
+
 const saltRounds = 10;
 
 
@@ -27,10 +30,10 @@ router.post('/api/register', function(req, res, next) {
 		res.send();
 	} else {
 		if (personInfo.password == personInfo.passwordConf) {
-			User.findOne({email:personInfo.email},function(err,data){
+			model.User.findOne({email:personInfo.email},function(err,data){
 				if(!data){
 					var c;
-					User.findOne({},function(err,data){
+					model.User.findOne({},function(err,data){
 
 						if (data) {
 							console.log("if");
@@ -41,7 +44,7 @@ router.post('/api/register', function(req, res, next) {
 						
 						bcrypt.hash(personInfo.password, saltRounds, function (err,   hash){
 						console.log(hash);
-						var newPerson = new User({
+						var newPerson = new model.User({
 							unique_id:c,
 							email:personInfo.email,
 							username: personInfo.username,
@@ -77,15 +80,22 @@ router.get('/login', function (req, res, next) {
 
 router.post('/api/login', function (req, res, next) {
 	//console.log(req.body);
-	User.findOne({email:req.body.email},function(err,data){
+	model.User.findOne({email:req.body.email},function(err,data){
 		if(data){
 			bcrypt.compare(req.body.password, data.password, function (err, result){
-				console.log(result);
 			if(result){
+				const token = jwt.sign(
+					{ user_id: data._id, email: data.email },
+					"testkey",
+					{
+					  expiresIn: "2h",
+					}
+				  );
 				//console.log("Done Login");
-				req.session.userId = data.unique_id;
+				// req.session.userId = data.unique_id;
+				console.log(data);
 				//console.log(req.session.userId);
-				res.send({"Success":"Success!"});
+				res.cookie('token', token).send({"Success":"Success!"});
 				
 			}else{
 				res.send({"Success":"Wrong password!"});
@@ -98,30 +108,45 @@ router.post('/api/login', function (req, res, next) {
 
 router.get('/profile', function (req, res, next) {
 	console.log("profile");
-	User.findOne({unique_id:req.session.userId},function(err,data){
-		console.log("data");
-		console.log(data);
-		if(!data){
-			res.redirect('/login');
-		}else{
-			//console.log("found");
-			return res.render('data.ejs', {"name":data.username,"email":data.email,"image":data.profileimg});
-		}
-	});
+	if (req.cookies.token){
+		const decoded = jwt.verify(req.cookies.token, "testkey");
+		model.Blacklistjwt.findOne({token:req.cookies.token},function(err,result){
+			if(!result){
+				model.User.findOne({email:decoded.email},function(err,data){
+					console.log(data);
+					if(!data){
+						res.redirect('/login');
+					}else{
+						//console.log("found");
+						return res.render('data.ejs', {"name":data.username,"email":data.email,"image":data.profileimg});
+					}
+				});
+			}else{
+				res.redirect('/login');
+			}
+		});
+		
+	}
+	else
+		res.redirect('/login');
+
 });
 
 router.get('/logout', function (req, res, next) {
-	console.log("logout")
-	if (req.session) {
-    // delete session object
-    req.session.destroy(function (err) {
-    	if (err) {
-    		return next(err);
-    	} else {
-    		return res.redirect('/login');
-    	}
-    });
-}
+
+	var newlogout = new model.Blacklistjwt({
+		token: req.cookies.token
+	});
+	newlogout.save(function(err, result){
+		if(err)
+			console.log(err);
+		else
+			console.log('Success');
+	});
+
+	res.clearCookie('token');
+	return res.redirect('/login');
+
 });
 
 router.get('/forgetpass', function (req, res, next) {
@@ -131,7 +156,7 @@ router.get('/forgetpass', function (req, res, next) {
 router.post('/api/forgetpass', function (req, res, next) {
 	//console.log('req.body');
 	//console.log(req.body);
-	User.findOne({email:req.body.email},function(err,data){
+	model.User.findOne({email:req.body.email},function(err,data){
 		console.log(data);
 		if(!data){
 			res.send({"Success":"This Email Is not regestered!"});
